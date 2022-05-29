@@ -5,6 +5,16 @@
 *.Segy 
 *.Sgy 
 
+segy_demo
+
+# cmake & make
+*/CMakeFiles
+*/config.tests
+*autogen
+*Cache*
+*cache*
+*.cmake
+
 # C++ 
 # Prerequisites
 *.d

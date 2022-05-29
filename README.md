@@ -32,4 +32,5 @@
 
  - [x] 完成 segy 文件到二进制文件
  - [ ] 扫描出道间距，即 inline 和 crossline 方向两道直接的间距
- - [ ] 完成 二进制文件到 segy 文件的转换
+ - [ ] 添加进度条 (Scan Segy File & Convert Segy To Dat File)
+ - [ ] 完成 二进制文件 到 segy 文件的转换

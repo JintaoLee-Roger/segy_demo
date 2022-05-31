@@ -11,6 +11,7 @@
 
 #include "segy.h"
 #include <iostream>
+#include <cmath>
 
 Segy::Segy() {
 
@@ -32,6 +33,8 @@ bool Segy::open_file(const char * infile){
     if (in_) {
         in_.close();
         bkeys.clear();
+        in_interval = 0;
+        xl_interval = 0;
     }
     in_.open(infile, std::ios::in | std::ios::binary);
     if (! in_) {
@@ -145,7 +148,10 @@ QString Segy::get_default_xline_loc() {
 
 
 void Segy::set_location(int inline_loc, int xline_loc, int x_loc, int y_loc) {
-    if (inline_loc != bkeys["in_loc"] || xline_loc != bkeys["xl_loc"]) {
+    if (inline_loc != bkeys["in_loc"] ||
+        xline_loc != bkeys["xl_loc"] ||
+        x_loc != bkeys["x_loc"] ||
+        y_loc != bkeys["y_loc"]) {
         bkeys["in_loc"] = inline_loc;
         bkeys["xl_loc"] = xline_loc;
         bkeys["x_loc"] = x_loc;
@@ -168,11 +174,18 @@ QString Segy::scan(){
 
     out += ("Inline location: " + QString::number(bkeys["in_loc"]) + "\n");
     out += ("crossline location: " + QString::number(bkeys["xl_loc"]) + "\n");
-    out += ("Inline range: " + QString::number(bkeys["in_min"]) + " - " + QString::number(bkeys["in_max"]) + "\n");
-    out += ("Crossline range: " + QString::number(bkeys["xl_min"]) + " - " + QString::number(bkeys["xl_max"]) + "\n");
 
     out += ("X location: " + QString::number(bkeys["x_loc"]) + "\n");
     out += ("Y location: " + QString::number(bkeys["y_loc"]) + "\n");
+
+    out += "Scalar to coordinates: ";
+    out += QString::number(getValueFromLocation(71, false, 1)) + "\n";
+
+    out += ("Inline interval: " + QString::number(in_interval) + "\n");
+    out += ("Crossline interval: " + QString::number(xl_interval) + "\n");
+
+    out += ("Inline range: " + QString::number(bkeys["in_min"]) + " - " + QString::number(bkeys["in_max"]) + "\n");
+    out += ("Crossline range: " + QString::number(bkeys["xl_min"]) + " - " + QString::number(bkeys["xl_max"]) + "\n\n");
 
     out += ("Data shape (ni, nx, nt): " + QString::number(bkeys["ni"]) + ", " + QString::number(bkeys["nx"]) + ", " + QString::number(bkeys["nt"]) + "\n");
 
@@ -301,13 +314,15 @@ void Segy::guessLoc() {
     }
 }
 
-void Segy::scan_() { // TODO, x, y interval
+void Segy::scan_() { // TODO, inline, crossline interval
+    // inline range
     int inmin = getValueFromLocation(bkeys["in_loc"], false, 1);
     int inmax = getValueFromLocation(bkeys["in_loc"], false, bkeys["ntrace"]);
     bkeys["in_max"] = inmax;
     bkeys["in_min"] = inmin;
     bkeys["ni"] = inmax - inmin + 1;
 
+    // crossline range
     int temp = getValueFromLocation(bkeys["xl_loc"], false, 1);
     int xlmax = temp;
     int xlmin = temp;
@@ -326,7 +341,37 @@ void Segy::scan_() { // TODO, x, y interval
     bkeys["xl_max"] = xlmax;
     bkeys["xl_min"] = xlmin;
     bkeys["nx"] = xlmax - xlmin + 1;
+
+    // total trace
     bkeys["total_trace"] = bkeys["ni"] * bkeys["nx"];
+
+    // inline, crossline intervals
+    clc_trace_interval();
+}
+
+void Segy::clc_trace_interval() {
+    // nx must larger than 11, ntrace must larger than 5*nx+1
+    int64_t x1 = getValueFromLocation(bkeys["x_loc"], false, 1);
+    int64_t y1 = getValueFromLocation(bkeys["y_loc"], false, 1);
+    int in1 = getValueFromLocation(bkeys["in_loc"], false, 1);
+    int xl1 = getValueFromLocation(bkeys["xl_loc"], false, 1);
+
+    int in2, xl2;
+    int64_t x2;
+    int64_t y2;
+
+    x2 = getValueFromLocation(bkeys["x_loc"], false, 11);
+    y2 = getValueFromLocation(bkeys["y_loc"], false, 11);
+    xl_interval = std::sqrt(std::pow(x2-x1, 2) + std::pow(y2-y1, 2)) / 10.0;
+
+    in2 = getValueFromLocation(bkeys["in_loc"], false, 5*bkeys["nx"]+1);
+    xl2 = getValueFromLocation(bkeys["xl_loc"], false, 5*bkeys["nx"]+1);
+    x2 = getValueFromLocation(bkeys["x_loc"], false, 5*bkeys["nx"]+1);
+    y2 = getValueFromLocation(bkeys["y_loc"], false, 5*bkeys["nx"]+1);
+
+    in_interval = std::sqrt(std::pow(y2-y1, 2) + std::pow(x2-x1, 2) -
+                            std::pow((xl2-xl1)*xl_interval, 2)) / (in2-in1);
+
 }
 
 void Segy::readOneTrace(std::vector<float>& trace, int64_t idx_trace) {

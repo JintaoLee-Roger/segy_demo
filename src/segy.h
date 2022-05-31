@@ -20,43 +20,87 @@
 #include <climits>
 #include <QString>
 #include <vector>
-//#include <QObject>
+#include <QObject>
 
-class Segy {
+class Segy : public QObject {
+    Q_OBJECT
   public:
     Segy();
     ~Segy();
 
+    // open a segy file by a name
     bool open_file(const char * infile);
+
+    //textheader in EBCDIC format
     QString textHeader_EBCDIC();
+
+    //textheader in ASCII format
     QString textHeader_ASCII();
+
+    //textheader in guess format
     QString textHeader_default();
+
+    //binary header, format: (loc) discription: value
     QString binaryHeader_QString();
+
+    //trace header in t_num_th trace, format: (loc) discription: value
     QString traceHeader_QString(int64_t t_num);
+
+    // the guessed location
     QString get_default_inline_loc();
     QString get_default_xline_loc();
+
+    // the important parameters of segy file
     QString scan();
 
+    // change the location
     void set_location(int inline_loc, int xline_loc, int x_loc, int y_loc);
 
+    // convert
     bool toDat(const QString outfile);
 
+  signals:
+    // emit a number to show the process
+    void scan_process(int proc);
+    void to_dat_process(int proc);
+
   private:
-    std::fstream in_;
-    std::fstream out_;
+    std::fstream in_; // segy file
+    std::fstream out_; // .dat file
     bool is_ebcdic;
     char text_header[3201];
-    std::map<const char *, int64_t> bkeys = {}; // nt, dt, dformat, ntrace, in_loc, x_loc
 
+    // nt, dt, dformat, ntrace, in_loc, xl_loc
+    // x_loc, y_loc, in_max, in_min, xl_max, xl_min
+    // x_max, x_min, y_max, y_min, ni, nx, total_trace
+    std::map<const char *, int64_t> bkeys = {}; // keys
+    double in_interval = 0;
+    double xl_interval = 0;
+
+    // read 3200 byte
     void getTextHeader();
+
+    // guess text header format
     bool isTextInEBCDICFormat(const char * text);
+
+    // convert EBCDIC char to ASCII char
     char getASCIIFromEBCDIC(char c);
 
+    // get binary or trace header key value in a key location
+    // return: a key value
+    // params:
+    //      loc: location of a key
+    //      is_binaryheader: binaryheader key or traceheader key
+    //      trace: trace index, >= 1,
+    //             this param will be ignore when is_binaryheader is true
     int64_t getValueFromLocation(const int loc, bool is_binaryheader = true, int64_t trace = 1);
 
+    // guess inline and crossline number's location
     void guessLoc();
 
+    // scan the range of inline, crossline and their interval
     void scan_();
+    void clc_trace_interval();
 
     float ibm_to_ieee(float value, bool is_big_endian_input);
     void readOneTrace(std::vector<float>& trace, int64_t idx_trace);
@@ -64,10 +108,6 @@ class Segy {
 
     template <typename T>
     T swap_endian(T u);
-
-  signals:
-    void scan_process(int proc);
-    void to_dat_process(int proc);
 
 };
 

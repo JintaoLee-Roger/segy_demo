@@ -21,31 +21,43 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    Segy segyF = Segy();
+    Segy segyF = Segy(); // segy file
 
 private slots:
+    // change text of textheader window to EBCDIC or ASCII format
     void change_text_header(QString formt);
 
+    // change the text by a trace index
     void change_trace_header(QString t_num);
 
+    // show the process of scan
     void show_scan_process(int proc);
 
+    // show the process of converting
     void show_to_dat_process(int proc);
 
+    // open file diagm
     void on_openfile_btn_clicked();
 
+    // open textheader window
     void on_textheader_wind_btn_clicked();
 
+    // open binaryheader window
     void on_binheader_wind_btn_clicked();
 
+    // open traceheader window, show the specail trace header
     void on_traceheader_wind_btn_clicked();
 
+    // scan segy file
     void on_scan_btn_clicked();
 
+    // convert segy file to binary file (.dat)
     void on_convrt_dat_btn_clicked();
 
+    // select a dir and input a specail .dat file name
     void on_savefile_btn_clicked();
 
+    // press enter to change the text of a trace header
     void on_trace_num_line_returnPressed();
 
 private:
@@ -56,5 +68,7 @@ private:
     TextHeaderWindow *text_header_window = new TextHeaderWindow;
     BinaryHeaderWindow *binary_header_window = new BinaryHeaderWindow;
     TraceHeaderWindow *trace_header_window = new TraceHeaderWindow;
+
+    void init_connect();
 };
 #endif // MAINWINDOW_H

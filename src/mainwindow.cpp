@@ -9,15 +9,30 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->setAttribute(Qt::WA_QuitOnClose, true);
-    connect(this->text_header_window,
-                     SIGNAL(changeFormat(QString)),
-                     this,
-                     SLOT(change_text_header(QString)));
 
+    // change text format, EBCDIC or ASCII
+    connect(this->text_header_window,
+            SIGNAL(changeFormat(QString)),
+            this,
+            SLOT(change_text_header(QString)));
+
+    // change trace header text by index from trace header window
     connect(this->trace_header_window,
             SIGNAL(changeText(QString)),
             this,
             SLOT(change_trace_header(QString)));
+
+    // show scan process
+    connect(this->segyF,
+            SIGNAL(scan_process(int)),
+            this,
+            SLOT(show_scan_process(int)));
+
+    // show convert to dat process
+    connect(this->segyF,
+            SIGNAL(to_dat_process(int)),
+            this,
+            SLOT(show_to_dat_process(int)));
 }
 
 MainWindow::~MainWindow()
@@ -105,6 +120,11 @@ void MainWindow::on_scan_btn_clicked()
     }
 }
 
+void MainWindow::show_scan_process(int proc) {
+    QString s = "Scan Segy File Process: " + QString::number(proc*10) + "%";
+    ui->scan_out_textline->setText(s);
+}
+
 void MainWindow::on_convrt_dat_btn_clicked()
 {
     if (is_open_segy_) {
@@ -123,6 +143,10 @@ void MainWindow::on_convrt_dat_btn_clicked()
             message.exec();
         }
     }
+}
+
+void MainWindow::show_to_dat_process(int proc) { // TODO 
+
 }
 
 

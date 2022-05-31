@@ -44,8 +44,8 @@ bool Segy::open_file(const char * infile){
     bkeys["nt"] = getValueFromLocation(21, true);
     bkeys["dt"] = getValueFromLocation(17, true);
     bkeys["dformat"] = getValueFromLocation(25, true);
-    bkeys["xloc"] = 73;
-    bkeys["yloc"] = 77;
+    bkeys["x_loc"] = 73;
+    bkeys["y_loc"] = 77;
 
     in_.seekg(0, std::ios::end);
     uintmax_t flength = in_.tellg();
@@ -139,17 +139,17 @@ QString Segy::get_default_inline_loc() {
 }
 
 QString Segy::get_default_xline_loc() {
-    return QString::number(bkeys["x_loc"]);
+    return QString::number(bkeys["xl_loc"]);
 }
 
 
 
 void Segy::set_location(int inline_loc, int xline_loc, int x_loc, int y_loc) {
-    if (inline_loc != bkeys["in_loc"] || xline_loc != bkeys["x_loc"]) {
+    if (inline_loc != bkeys["in_loc"] || xline_loc != bkeys["xl_loc"]) {
         bkeys["in_loc"] = inline_loc;
-        bkeys["x_loc"] = xline_loc;
-        bkeys["xloc"] = x_loc;
-        bkeys["yloc"] = y_loc;
+        bkeys["xl_loc"] = xline_loc;
+        bkeys["x_loc"] = x_loc;
+        bkeys["y_loc"] = y_loc;
         scan_();
     }
 }
@@ -161,23 +161,20 @@ QString Segy::scan(){
     }
     QString out = "Segy data information: \n\n";
 
-    int ni = bkeys["in_max"] - bkeys["in_min"] + 1;
-    int nx = bkeys["xl_max"] - bkeys["xl_min"] + 1;
-
     out += ("nt (N samples per trace): " + QString::number(bkeys["nt"]) + "\n");
     out += ("dt (Sample interval): " + QString::number(bkeys["dt"]) + "\n");
     out += ("dformat (Data sample format code, 1-IBM, 5-IEEE): " + QString::number(bkeys["dformat"]) + "\n");
     out += ("ntrace (Number of tarces): " + QString::number(bkeys["ntrace"]) + "\n\n");
 
     out += ("Inline location: " + QString::number(bkeys["in_loc"]) + "\n");
-    out += ("crossline location: " + QString::number(bkeys["x_loc"]) + "\n");
+    out += ("crossline location: " + QString::number(bkeys["xl_loc"]) + "\n");
     out += ("Inline range: " + QString::number(bkeys["in_min"]) + " - " + QString::number(bkeys["in_max"]) + "\n");
     out += ("Crossline range: " + QString::number(bkeys["xl_min"]) + " - " + QString::number(bkeys["xl_max"]) + "\n");
 
-    out += ("X location: " + QString::number(bkeys["xloc"]) + "\n");
-    out += ("Y location: " + QString::number(bkeys["yloc"]) + "\n");
+    out += ("X location: " + QString::number(bkeys["x_loc"]) + "\n");
+    out += ("Y location: " + QString::number(bkeys["y_loc"]) + "\n");
 
-    out += ("Data shape (ni, nx, nt): " + QString::number(ni) + ", " + QString::number(nx) + ", " + QString::number(bkeys["nt"]) + "\n");
+    out += ("Data shape (ni, nx, nt): " + QString::number(bkeys["ni"]) + ", " + QString::number(bkeys["nx"]) + ", " + QString::number(bkeys["nt"]) + "\n");
 
     return out;
 }
@@ -187,7 +184,6 @@ bool Segy::toDat(const QString outfile) {
     if (bkeys.find("in_max") == bkeys.end()) {
         scan_();
     }
-
 
     out_.open(outfile.toStdString(), std::ios::out | std::ios::binary);
     if (!out_) {
@@ -199,7 +195,7 @@ bool Segy::toDat(const QString outfile) {
 
     int64_t idx = 1;
     size_t inl = getValueFromLocation(bkeys["in_loc"], false, 1);
-    size_t xl = getValueFromLocation(bkeys["x_loc"], false, 1);
+    size_t xl = getValueFromLocation(bkeys["xl_loc"], false, 1);
     for (int i = bkeys["in_min"]; i <= bkeys["in_max"]; ++i) {
         for (int j = bkeys["xl_min"]; j <= bkeys["xl_max"]; ++j) {
             if (inl == i && xl == j) {
@@ -207,11 +203,17 @@ bool Segy::toDat(const QString outfile) {
                 writeOneTrace(trace);
                 ++idx;
                 inl = getValueFromLocation(bkeys["in_loc"], false, idx);
-                xl = getValueFromLocation(bkeys["x_loc"], false, idx);
+                xl = getValueFromLocation(bkeys["xl_loc"], false, idx);
             }
             else {
                 std::fill(trace.begin(), trace.end(), 0);
                 writeOneTrace(trace);
+            }
+
+            // emit a signal, to show the process
+            int64_t idx_total = (i - bkeys["in_min"]) * bkeys["nx"] + (j - bkeys["xl_min"]);
+            if (0 == idx_total % (bkeys["total_trace"] / 10)) {
+                emit to_dat_process(idx_total * 10 / bkeys["total_trace"]);
             }
         }
     }
@@ -271,7 +273,7 @@ int64_t Segy::getValueFromLocation(const int loc, bool is_binaryheader, int64_t 
     }
 }
 
-void Segy::guessLoc() { // TODO, check it
+void Segy::guessLoc() {
 //     size_t inline_loc[3] = {189, 9, 5};
 //     size_t xline_loc[3] = {193, 21, 17};
     size_t inline_loc[3] = {5, 9, 189};
@@ -293,7 +295,7 @@ void Segy::guessLoc() { // TODO, check it
         int xl2 = getValueFromLocation(xline_loc[i], false, start3);
 
         if (xl1 > 0 && xl2 > 0 && xl1 != xl2 && (xl2 - xl1) < 10000) {
-            bkeys["x_loc"] = xline_loc[i];
+            bkeys["xl_loc"] = xline_loc[i];
             break;
         }
     }
@@ -304,19 +306,27 @@ void Segy::scan_() { // TODO, x, y interval
     int inmax = getValueFromLocation(bkeys["in_loc"], false, bkeys["ntrace"]);
     bkeys["in_max"] = inmax;
     bkeys["in_min"] = inmin;
+    bkeys["ni"] = inmax - inmin + 1;
 
-    int temp = getValueFromLocation(bkeys["x_loc"], false, 1);
+    int temp = getValueFromLocation(bkeys["xl_loc"], false, 1);
     int xlmax = temp;
     int xlmin = temp;
 
     for (int64_t i = 2; i < bkeys["ntrace"]+1; ++i) {
-        temp = getValueFromLocation(bkeys["x_loc"], false, i);
+        temp = getValueFromLocation(bkeys["xl_loc"], false, i);
         if (temp > xlmax) xlmax = temp;
         if (temp < xlmin) xlmin = temp;
+
+        // emit a signal, to show the process
+        if (0 == i % (bkeys["ntrace"] / 10)) {
+            emit scan_process(i * 10 / bkeys["ntrace"]);
+        }
     }
 
     bkeys["xl_max"] = xlmax;
     bkeys["xl_min"] = xlmin;
+    bkeys["nx"] = xlmax - xlmin + 1;
+    bkeys["total_trace"] = bkeys["ni"] * bkeys["nx"];
 }
 
 void Segy::readOneTrace(std::vector<float>& trace, int64_t idx_trace) {

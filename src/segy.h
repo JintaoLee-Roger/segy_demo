@@ -20,6 +20,7 @@
 #include <climits>
 #include <QString>
 #include <vector>
+//#include <QObject>
 
 class Segy {
   public:
@@ -63,6 +64,11 @@ class Segy {
 
     template <typename T>
     T swap_endian(T u);
+
+  signals:
+    void scan_process(int proc);
+    void to_dat_process(int proc);
+
 };
 
 template <typename T>

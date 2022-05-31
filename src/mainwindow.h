@@ -28,6 +28,10 @@ private slots:
 
     void change_trace_header(QString t_num);
 
+    void show_scan_process(int proc);
+
+    void show_to_dat_process(int proc);
+
     void on_openfile_btn_clicked();
 
     void on_textheader_wind_btn_clicked();

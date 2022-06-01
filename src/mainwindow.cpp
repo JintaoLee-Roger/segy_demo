@@ -145,9 +145,11 @@ void MainWindow::on_convrt_dat_btn_clicked()
             qpd.setWindowTitle("Converting Process");
             qpd.setLabelText("Wait...");
             qpd.setCancelButtonText("cancel");
-            qpd.setRange(0, 10);
+            qpd.setRange(0, 100);
             qpd.setModal(true);
             qpd.showNormal();
+
+            qpd.setValue(0);
 
 
             bool is_complete = segyF.toDat(ui->outname_line->text(), qpd);

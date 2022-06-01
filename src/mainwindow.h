@@ -33,9 +33,6 @@ private slots:
     // show the process of scan
     void show_scan_process(int proc);
 
-    // show the process of converting
-    void show_to_dat_process(int proc);
-
     // open file diagm
     void on_openfile_btn_clicked();
 

@@ -32,12 +32,6 @@ void MainWindow::init_connect() {
             SIGNAL(scan_process(int)),
             this,
             SLOT(show_scan_process(int)));
-
-    // show convert to dat process
-    connect(&segyF,
-            SIGNAL(to_dat_process(int)),
-            this,
-            SLOT(show_to_dat_process(int)));
 }
 
 MainWindow::~MainWindow()
@@ -51,7 +45,7 @@ void MainWindow::on_openfile_btn_clicked()
     QString segy_name = QFileDialog::getOpenFileName(
                             this,
                             "Open Segy File",
-                            "../segy_demo/",
+                            ".",
                             "Segy File (*.segy *.sgy *.Segy *.Sgy)");
 
     if (! segy_name.isEmpty()) {
@@ -141,18 +135,19 @@ void MainWindow::on_convrt_dat_btn_clicked()
 {
     if (is_open_segy_) {
         if(! ui->outname_line->text().isEmpty()){
-            QProgressDialog qpd;
-            qpd.setWindowTitle("Converting Process");
-            qpd.setLabelText("Wait...");
-            qpd.setCancelButtonText("cancel");
-            qpd.setRange(0, 100);
-            qpd.setModal(true);
-            qpd.showNormal();
+            QProgressDialog *qpd = new QProgressDialog;
+            qpd->setWindowTitle("Converting Process");
+            qpd->setLabelText("Wait...");
+            qpd->setCancelButtonText("cancel");
+            qpd->setRange(0, 100);
+            qpd->setModal(true);
+            qpd->showNormal();
 
-            qpd.setValue(0);
+            qpd->setValue(0);
 
 
-            bool is_complete = segyF.toDat(ui->outname_line->text(), qpd);
+            bool is_complete = segyF.toDat(ui->outname_line->text(), *qpd);
+            delete qpd;
 
             if (is_complete) {
                 QMessageBox message(QMessageBox::NoIcon, "Finished", "Success!");
@@ -166,11 +161,6 @@ void MainWindow::on_convrt_dat_btn_clicked()
             message.exec();
         }
     }
-}
-
-// show the process of converting
-void MainWindow::show_to_dat_process(int proc) { // TODO
-
 }
 
 // select a dir and input a specail .dat file name

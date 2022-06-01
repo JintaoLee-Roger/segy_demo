@@ -226,13 +226,10 @@ bool Segy::toDat(const QString outfile, QProgressDialog & qpd) {
             // emit a signal, to show the process
             int64_t idx_total = (i - bkeys["in_min"]) * bkeys["nx"] + (j - bkeys["xl_min"]);
             if (0 == idx_total % (bkeys["total_trace"] / 100)) {
-//                emit to_dat_process(idx_total * 10 / bkeys["total_trace"]);
                 qpd.setValue(idx_total * 100 / bkeys["total_trace"] + 1);
 
                 if(qpd.wasCanceled()){
-                    qpd.reset();
                     out_.close();
-
                     return false;
                 }
             }

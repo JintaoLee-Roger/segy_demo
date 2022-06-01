@@ -63,7 +63,6 @@ class Segy : public QObject {
   signals:
     // emit a number to show the process
     void scan_process(int proc);
-    void to_dat_process(int proc);
 
   private:
     std::fstream in_; // segy file

@@ -193,7 +193,7 @@ QString Segy::scan(){
 }
 
 
-bool Segy::toDat(const QString outfile) {
+bool Segy::toDat(const QString outfile, QProgressDialog & qpd) {
     if (bkeys.find("in_max") == bkeys.end()) {
         scan_();
     }
@@ -226,7 +226,15 @@ bool Segy::toDat(const QString outfile) {
             // emit a signal, to show the process
             int64_t idx_total = (i - bkeys["in_min"]) * bkeys["nx"] + (j - bkeys["xl_min"]);
             if (0 == idx_total % (bkeys["total_trace"] / 10)) {
-                emit to_dat_process(idx_total * 10 / bkeys["total_trace"]);
+//                emit to_dat_process(idx_total * 10 / bkeys["total_trace"]);
+                qpd.setValue(idx_total * 10 / bkeys["total_trace"] + 1);
+
+                if(qpd.wasCanceled()){
+                    qpd.reset();
+                    out_.close();
+
+                    return false;
+                }
             }
         }
     }

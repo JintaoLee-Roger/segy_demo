@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 
 #include <QMessageBox>
+#include <QProgressDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -140,7 +141,16 @@ void MainWindow::on_convrt_dat_btn_clicked()
 {
     if (is_open_segy_) {
         if(! ui->outname_line->text().isEmpty()){
-            bool is_complete = segyF.toDat(ui->outname_line->text());
+            QProgressDialog qpd;
+            qpd.setWindowTitle("Converting Process");
+            qpd.setLabelText("Wait...");
+            qpd.setCancelButtonText("cancel");
+            qpd.setRange(0, 10);
+            qpd.setModal(true);
+            qpd.showNormal();
+
+
+            bool is_complete = segyF.toDat(ui->outname_line->text(), qpd);
 
             if (is_complete) {
                 QMessageBox message(QMessageBox::NoIcon, "Finished", "Success!");

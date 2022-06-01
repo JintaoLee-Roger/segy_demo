@@ -21,6 +21,7 @@
 #include <QString>
 #include <vector>
 #include <QObject>
+#include <QProgressDialog>
 
 class Segy : public QObject {
     Q_OBJECT
@@ -57,7 +58,7 @@ class Segy : public QObject {
     void set_location(int inline_loc, int xline_loc, int x_loc, int y_loc);
 
     // convert
-    bool toDat(const QString outfile);
+    bool toDat(const QString outfile, QProgressDialog & qpd);
 
   signals:
     // emit a number to show the process

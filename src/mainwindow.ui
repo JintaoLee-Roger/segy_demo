@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>724</height>
+    <height>756</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,6 +26,7 @@
     <property name="font">
      <font>
       <pointsize>15</pointsize>
+      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
@@ -384,7 +385,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>620</y>
+      <y>670</y>
       <width>251</width>
       <height>35</height>
      </rect>
@@ -402,7 +403,7 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>620</y>
+      <y>670</y>
       <width>401</width>
       <height>35</height>
      </rect>
@@ -417,7 +418,7 @@
     <property name="geometry">
      <rect>
       <x>680</x>
-      <y>620</y>
+      <y>670</y>
       <width>101</width>
       <height>35</height>
      </rect>
@@ -429,6 +430,48 @@
     </property>
     <property name="text">
      <string>Select Dir</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>620</y>
+      <width>221</width>
+      <height>35</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Filling the miss trace with</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="fills_line">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>620</y>
+      <width>161</width>
+      <height>35</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A float number, the default is 0, and can also be nan and NAN&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
   </widget>

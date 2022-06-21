@@ -7,24 +7,23 @@ namespace Ui {
 class TraceHeaderWindow;
 }
 
-class TraceHeaderWindow : public QWidget
-{
-    Q_OBJECT
+class TraceHeaderWindow : public QWidget {
+  Q_OBJECT
 
-public:
-    explicit TraceHeaderWindow(QWidget *parent = nullptr);
-    ~TraceHeaderWindow();
-    void set_trace_num(QString);
-    void setTraceHeader(QString trace_header);
+ public:
+  explicit TraceHeaderWindow(QWidget *parent = nullptr);
+  ~TraceHeaderWindow();
+  void set_trace_num(QString);
+  void setTraceHeader(QString trace_header);
 
-signals:
-    void changeText(QString t_num);
+ signals:
+  void changeText(QString t_num);
 
-private slots:
-    void on_trace_num_line_returnPressed();
+ private slots:
+  void on_trace_num_line_returnPressed();
 
-private:
-    Ui::TraceHeaderWindow *ui;
+ private:
+  Ui::TraceHeaderWindow *ui;
 };
 
-#endif // TRACEHEADERWINDOW_H
+#endif  // TRACEHEADERWINDOW_H

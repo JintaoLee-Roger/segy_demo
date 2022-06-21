@@ -7,18 +7,17 @@ namespace Ui {
 class BinaryHeaderWindow;
 }
 
-class BinaryHeaderWindow : public QWidget
-{
-    Q_OBJECT
+class BinaryHeaderWindow : public QWidget {
+  Q_OBJECT
 
-public:
-    explicit BinaryHeaderWindow(QWidget *parent = nullptr);
-    ~BinaryHeaderWindow();
+ public:
+  explicit BinaryHeaderWindow(QWidget *parent = nullptr);
+  ~BinaryHeaderWindow();
 
-    void setBinaryHeader(QString binary_header);
+  void setBinaryHeader(QString binary_header);
 
-private:
-    Ui::BinaryHeaderWindow *ui;
+ private:
+  Ui::BinaryHeaderWindow *ui;
 };
 
-#endif // BINARYHEADERWINDOW_H
+#endif  // BINARYHEADERWINDOW_H

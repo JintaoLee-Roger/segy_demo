@@ -50,8 +50,7 @@ const std::map<int, const char *> keysmapBH = {
     {311, "Time basis code"},
     {313, "number of trace header in this file"},
     {321, "Byte offset of first trace"},
-    {329, "Number of 3200-byte data trailer stanza"}
-};
+    {329, "Number of 3200-byte data trailer stanza"}};
 
 const std::set<int> keys4bBH = {1, 5, 9, 307, 329};
 const std::set<int> keys8bBH = {313, 321};
@@ -69,7 +68,9 @@ const std::map<int, const char *> keysmapTH = {
     {31, "Number of vertically summed traces yielding this trace"},
     {33, "Number of horizontally stacked traces yielding this trace"},
     {35, "Data use"},
-    {37, "Distance from center of the source point to the center of the receiver group"},
+    {37,
+     "Distance from center of the source point to the center of the receiver "
+     "group"},
     {41, "Elevation of receiver group"},
     {45, "Surface elevation at source location"},
     {49, "Source depth below surface"},
@@ -125,7 +126,8 @@ const std::map<int, const char *> keysmapTH = {
     {167, "Time basis code"},
     {169, "Trace weighting factor"},
     {171, "Geophone group number of roll switch position one"},
-    {173, "Geophone group number of trace number one within original field record"},
+    {173,
+     "Geophone group number of trace number one within original field record"},
     {175, "Geophone group number of last trace within original field record"},
     {177, "Gap size (total number of groups dropped)"},
     {179, "Over travel associated with taper at beginning or end of line"},
@@ -140,14 +142,13 @@ const std::map<int, const char *> keysmapTH = {
     {213, "Device/Trace Identifier"},
     {215, "Scalar to be applied to bytes 95-114"},
     {217, "Source Type/Orientation"},
-    {231, "Source Measurement Unit"}
-};
+    {231, "Source Measurement Unit"}};
 
-const std::set<int> keys4bTH = {
-    1, 5, 9, 13, 17, 21, 25, 37, 41, 45, 49, 53, 57,
-    61, 65, 73, 77, 81, 85, 181, 185, 189, 193, 197};
-const std::set<int> keysImpTH = {
-    5, 9, 17, 21, 71, 73, 77, 109, 115, 117, 181, 185, 189, 193};
+const std::set<int> keys4bTH = {1,  5,  9,  13,  17,  21,  25,  37,
+                                41, 45, 49, 53,  57,  61,  65,  73,
+                                77, 81, 85, 181, 185, 189, 193, 197};
+const std::set<int> keysImpTH = {5,   9,   17,  21,  71,  73,  77,
+                                 109, 115, 117, 181, 185, 189, 193};
 
 // A key map that convert EBCDIC to ASCII format
 const std::map<unsigned char, char> kEBCDICtoASCIImap = {
@@ -186,6 +187,5 @@ const std::map<char, unsigned char> kASCIItoEBCDICmap = {
     {'V', 229},  {'W', 230}, {'X', 231},  {'Y', 232}, {'Z', 233}, {'0', 240},
     {'1', 241},  {'2', 242}, {'3', 243},  {'4', 244}, {'5', 245}, {'6', 246},
     {'7', 247},  {'8', 248}, {'9', 249}};
-
 
 #endif
